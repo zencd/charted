@@ -1,1 +1,119 @@
-demo goes here !!
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow"/>
+    <title>The Chart Contest</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="charted.min.css">
+
+    <script src="chart_data.js" type="application/javascript"></script>
+    <script src="charted.min.js" type="application/javascript"></script>
+    <!--<script src="charted.min.js" type="application/javascript"></script>-->
+
+    <style>
+        .static {
+            /*position: fixed;*/
+            /*right: 5px;*/
+            /*top: 5px;*/
+            color: white;
+            /*background-color: rgba(100, 100, 100, 0.7);*/
+            text-align: center;
+            padding: 3px 10px;
+            /*border-radius: 7px;*/
+            font-family: sans-serif;
+        }
+
+        .static a {
+            color: #222;
+            /*text-decoration: none;*/
+        }
+
+        body[data-color-mode="night"] .static a {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div id="main-wrapper">
+    <div class="static">
+        <!--Made by <a href="mailto:zeencd@gmail.com">Pavel Vlasov</a><br>-->
+        <a href="./charted.js">Source code and credits</a>
+    </div>
+
+
+    <div id="charts">
+        <h2>Followers</h2>
+        <div class="charted-chart" id="chart0"></div>
+        <h2>Subscribers</h2>
+        <div class="charted-chart" id="chart1"></div>
+        <h2>Fans</h2>
+        <div class="charted-chart" id="chart2"></div>
+        <h2>Haters</h2>
+        <div class="charted-chart" id="chart3"></div>
+        <h2>Others</h2>
+        <div class="charted-chart" id="chart4"></div>
+    </div>
+
+    <div id="color-mode-switch">
+        <a href="#" data-color-mode="false">Switch to Night Mode</a>
+    </div>
+</div>
+</body>
+
+<script>
+    const ChartView = window.ChartView;
+    const allCharts = [
+        ChartView.createChart(document.querySelector('#chart0'), realChartData[0]),
+        ChartView.createChart(document.querySelector('#chart1'), realChartData[1]),
+        ChartView.createChart(document.querySelector('#chart2'), realChartData[2]),
+        ChartView.createChart(document.querySelector('#chart3'), realChartData[3]),
+        ChartView.createChart(document.querySelector('#chart4'), realChartData[4]),
+    ];
+
+    setupColorModeSwitch();
+    resizeCharts();
+    window.addEventListener('resize', resizeCharts, false);
+
+    function resizeCharts() {
+        for (let i = 0; i < allCharts.length; i++) {
+            allCharts[i].setZoom(0.6, 1.0);
+            allCharts[i].resized();
+        }
+    }
+
+    function setupColorModeSwitch() {
+        const $colorMode = document.querySelector('#color-mode-switch a');
+        const colorModeTitles = {'day': 'Switch to Night Mode', 'night': 'Switch to Day Mode'};
+        const colorMode = (typeof localStorage !== 'undefined') ? localStorage.getItem('color-mode') : 'day';
+        if (colorMode) {
+            document.body.setAttribute('data-color-mode', colorMode);
+            $colorMode.innerText = colorModeTitles[colorMode];
+            for (let i = 0; i < allCharts.length; i++) {
+                allCharts[i].setColorMode(colorMode);
+            }
+        }
+        $colorMode.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            let prevMode = document.body.getAttribute('data-color-mode');
+            prevMode = prevMode === 'night' ? 'night' : 'day';
+            const newMode = prevMode === 'night' ? 'day' : 'night';
+            document.body.setAttribute('data-color-mode', newMode);
+            for (let i = 0; i < allCharts.length; i++) {
+                allCharts[i].setColorMode(newMode); // XXX call it AFTER the background has changed, otherwise some artifacts could appear
+            }
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem('color-mode', newMode);
+            }
+            $colorMode.innerText = colorModeTitles[newMode];
+        }, false);
+    }
+
+    setTimeout(function () {
+        // document.querySelectorAll('.charted-checkbox-checkbox')[0].click();
+    }, 300);
+</script>
+
+</html>
